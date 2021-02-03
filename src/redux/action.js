@@ -1,6 +1,6 @@
-export const setPlace = (data) => {
+export const setLocation = (data) => {
     return {
-        type: 'SET_PLACE',
+        type: 'SET_LOCATION',
         payload: {
             data: data,
         }
@@ -16,5 +16,5 @@ export const setDialogOpen = (open) => {
     }
 }
 
-export const SET_PLACE = setPlace().type;
+export const SET_LOCATION = setLocation().type;
 export const SET_DIALOG_OPEN = setDialogOpen().type;

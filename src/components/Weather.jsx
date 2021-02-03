@@ -47,19 +47,18 @@ const useStyles = makeStyles(styles);
 
 const mapStateToProps = (state) => {
 	console.log(state); return ({
-		city: state.weatherLocation.city,
-		place: state.weatherLocation.place,
+		location: state.weatherLocation.location
 	})
 }
 
-const Weather = ({ city, place }) => {
+const Weather = ({ location }) => {
 	const dispatch = useDispatch();
 	const classes = useStyles();
 	const date = new Date().getDay();
 	const dayList = ['日', '一', '二', '三', '四', '五', '六'];
 	const AuthorizationKey = 'CWB-330FC854-CB5C-4364-AE2C-600F34DCF8AE'
-	const weatherUrl = `/v1/rest/datastore/O-A0003-001?Authorization=${AuthorizationKey}&locationName=${place}`
-	const weather36hUrl = `/v1/rest/datastore/F-C0032-001?Authorization=${AuthorizationKey}&locationName=${city}`
+	const weatherUrl = `/v1/rest/datastore/O-A0003-001?Authorization=${AuthorizationKey}&locationName=${location.place}`
+	const weather36hUrl = `/v1/rest/datastore/F-C0032-001?Authorization=${AuthorizationKey}&locationName=${location.city}`
 	const [weatherStatus, setWeatherStatus] = useState({})
 
 	const fetchData = useCallback(() => {
