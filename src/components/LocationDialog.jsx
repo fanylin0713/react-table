@@ -18,7 +18,6 @@ const mapStateToProps = (state) => ({
 
 const LocationDialog = ({location, open}) => {
 	const dispatch = useDispatch();
-console.log(location)
 	const locationData = [
 		{
 			city: '臺北市',

@@ -8,8 +8,8 @@ import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 
+import WeatherIcon from './WeatherIcon';
 import LocationDialog from './LocationDialog';
-import { ReactComponent as Sun } from '../images/sun.svg';
 import { setDialogOpen } from '../redux/action';
 
 const styles = () => ({
@@ -45,11 +45,9 @@ const styles = () => ({
 
 const useStyles = makeStyles(styles);
 
-const mapStateToProps = (state) => {
-	console.log(state); return ({
-		location: state.weatherLocation.location
-	})
-}
+const mapStateToProps = (state) => ({
+	location: state.weatherLocation.location
+})
 
 const Weather = ({ location }) => {
 	const dispatch = useDispatch();
@@ -122,19 +120,15 @@ const Weather = ({ location }) => {
 			});
 	}
 
-	const handleOpenDialog = () => {
-		dispatch(setDialogOpen(true))
-	}
-
 	return (
 		<>
 			<LocationDialog />
 			<Paper className={classes.paper}>
 				<Box className={classes.container} >
-					<Button fullWidth onClick={handleOpenDialog}>
-						<Typography align='center' variant='h6' >{weatherStatus.location}</Typography>
+					<Button fullWidth onClick={() => dispatch(setDialogOpen(true))}>
+						<Typography align='center' variant='h6' >{location.city}</Typography>
 					</Button>
-					<Sun className={classes.weatherSvg} />
+					<WeatherIcon weatherCode={weatherStatus.weatherCode}/>
 					<Paper className={classes.weatherInformation}>
 						<Box pb={3}>
 							<Typography variant='body1'>星期{dayList[date]}</Typography>
