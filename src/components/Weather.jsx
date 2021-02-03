@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import axios from 'axios';
 import Box from '@material-ui/core/Box';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 
-import { ReactComponent as Sun } from './images/sun.svg';
+import { ReactComponent as Sun } from '../images/sun.svg';
 
 const styles = () => ({
 	paper: {
@@ -23,7 +23,7 @@ const styles = () => ({
 		padding: '20px 15px',
 		backgroundColor: '#C4E1FF'
 	},
-	svg: {
+	weatherSvg: {
 		width: '150px',
 		height: 'auto',
 		margin: '40px 27% 50px 27%'
@@ -31,6 +31,10 @@ const styles = () => ({
 	weatherInformation: {
 		padding: '10px 15px 10px 15px',
 		margin: '10px 0 0 0'
+	},
+	svg: {
+		width: '25px',
+		height: 'auto'
 	}
 });
 
@@ -45,23 +49,26 @@ const Weather = () => {
 	const weatherUrl = `/v1/rest/datastore/O-A0003-001?Authorization=${AuthorizationKey}&locationName=${locationName}`
 	const weather36hUrl = `/v1/rest/datastore/F-C0032-001?Authorization=${AuthorizationKey}&locationName=臺北市`
 	const [weatherStatus, setWeatherStatus] = useState({})
-	console.log(weatherStatus)
 
-	React.useEffect(() => {
-		const fetchData = async () => {
+	const fetchData = useCallback(() => {
+		const fetchingData = async () => {
 			const [realTimeData, weather36hData] = await Promise.all([
 				fetachGetRealtimeWeather(),
 				fetchGetWeather36h(),
 			]);
 
 			setWeatherStatus({
-				...realTimeData, 
+				...realTimeData,
 				...weather36hData
 			})
 		};
 
-		fetchData()
+		fetchingData();
 	}, []);
+
+	React.useEffect(() => {
+		fetchData();
+	}, [fetchData]);
 
 	const fetachGetRealtimeWeather = () => {
 		return axios.get(weatherUrl)
@@ -108,15 +115,19 @@ const Weather = () => {
 		<Paper className={classes.paper}>
 			<Box className={classes.container} >
 				<Typography align='center' variant='h6'>{weatherStatus.location}</Typography>
-				<Sun className={classes.svg} />
+				<Sun className={classes.weatherSvg} />
 				<Paper className={classes.weatherInformation}>
-					<Typography variant='body1'>星期{dayList[date]}</Typography>
-					<Typography variant='body1'>{`${weatherStatus.description}、${weatherStatus.comfortability}`}</Typography>
-					<Typography align='center' variant='h3'>{Math.round(weatherStatus.temp)}℃</Typography>
-					<Typography align='center' variant='body2'>{weatherStatus.minTemp}℃~{weatherStatus.maxTemp}℃</Typography>
-					<Typography align='right' variant='body2'>Wind:{weatherStatus.wind}m/h</Typography>
-					<Typography align='right' variant='body2'>Humidity:{weatherStatus.humid * 100}%</Typography>
-					<Typography align='right' variant='body2'>rain:{weatherStatus.rainPossibility}</Typography>
+					<Box pb={3}>
+						<Typography variant='body1'>星期{dayList[date]}</Typography>
+						<Typography variant='body1'>{`${weatherStatus.description}、${weatherStatus.comfortability}`}</Typography>
+					</Box>
+					<Box pb={3}>
+						<Typography align='center' variant='h3'>{Math.round(weatherStatus.temp)}℃</Typography>
+						<Typography align='center' variant='body2'>{weatherStatus.minTemp}℃~{weatherStatus.maxTemp}℃</Typography>
+					</Box>
+					<Typography align='right' variant='body2'>風速： {weatherStatus.wind} m/h</Typography>
+					<Typography align='right' variant='body2'>濕度：{Math.round(weatherStatus.humid * 100)} %</Typography>
+					<Typography align='right' variant='body2'>降雨機率：{weatherStatus.rainPossibility} %</Typography>
 				</Paper>
 			</Box>
 		</Paper>

@@ -1,4 +1,4 @@
-import Weather from './Weather';
+import Weather from './components/Weather';
 import Box from '@material-ui/core/Box';
 
 function App() {
