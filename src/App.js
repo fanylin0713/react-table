@@ -1,10 +1,10 @@
-import ReactTable from './ReactTable';
+import Weather from './Weather';
 import Box from '@material-ui/core/Box';
 
 function App() {
   return (
-    <Box p={3}>
-    <ReactTable />
+    <Box m={0} p={0} height="100%">
+      <Weather />
     </Box>
   );
 }
