@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
+import axios from 'axios';
 import Box from '@material-ui/core/Box';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
@@ -29,7 +30,7 @@ const styles = () => ({
 	},
 	weatherInformation: {
 		padding: '10px 15px 10px 15px',
-		margin:'10px 0 0 0'
+		margin: '10px 0 0 0'
 	}
 });
 
@@ -37,33 +38,85 @@ const useStyles = makeStyles(styles);
 
 const Weather = () => {
 	const classes = useStyles();
+	const date = new Date().getDay();
+	const dayList = ['日', '一', '二', '三', '四', '五', '六'];
+	const AuthorizationKey = 'CWB-330FC854-CB5C-4364-AE2C-600F34DCF8AE'
+	const locationName = '板橋'
+	const weatherUrl = `/v1/rest/datastore/O-A0003-001?Authorization=${AuthorizationKey}&locationName=${locationName}`
+	const weather36hUrl = `/v1/rest/datastore/F-C0032-001?Authorization=${AuthorizationKey}&locationName=臺北市`
+	const [weatherStatus, setWeatherStatus] = useState({})
+	console.log(weatherStatus)
 
 	React.useEffect(() => {
-		fetch('/v1/rest/datastore/O-A0003-001?Authorization=CWB-330FC854-CB5C-4364-AE2C-600F34DCF8AE&locationName=板橋', {
-			method: "GET",
-			mode: 'cors',
-			contentType: 'application/json',
-			headers: new Headers({
-				'Access-Control-Allow-Origin': '*',
-				"X-Requested-With": "XMLHttpRequest"
+		const fetchData = async () => {
+			const [realTimeData, weather36hData] = await Promise.all([
+				fetachGetRealtimeWeather(),
+				fetchGetWeather36h(),
+			]);
+
+			setWeatherStatus({
+				...realTimeData, 
+				...weather36hData
 			})
-		})
-			.then(res => { console.log(res) })
+		};
+
+		fetchData()
 	}, []);
 
+	const fetachGetRealtimeWeather = () => {
+		return axios.get(weatherUrl)
+			.then(res => {
+				const data = res.data.records.location[0];
+				const weatherElements = data.weatherElement.reduce(
+					(neededElements, item) => {
+						if (['WDSD', 'TEMP', 'HUMD'].includes(item.elementName)) {
+							neededElements[item.elementName] = item.elementValue;
+						}
+						return neededElements;
+					},
+					{}
+				);
+				return {
+					location: data.locationName,
+					time: data.time.obsTime,
+					wind: weatherElements.WDSD,
+					temp: weatherElements.TEMP,
+					humid: weatherElements.HUMD,
+				}
+			}).catch(err => {
+				console.log(err);
+			})
+	}
+
+	const fetchGetWeather36h = () => {
+		return axios.get(weather36hUrl)
+			.then((res) => {
+				const locationData = res.data.records.location[0];
+				const weatherElements = locationData.weatherElement.map(el => el.time[0].parameter);
+				return {
+					description: weatherElements[0].parameterName,
+					weatherCode: weatherElements[0].parameterValue,
+					rainPossibility: weatherElements[1].parameterName,
+					comfortability: weatherElements[3].parameterName,
+					maxTemp: weatherElements[4].parameterName,
+					minTemp: weatherElements[2].parameterName,
+				}
+			});
+	}
 
 	return (
 		<Paper className={classes.paper}>
 			<Box className={classes.container} >
-				<Typography align='center' variant='h6'>台北市</Typography>
+				<Typography align='center' variant='h6'>{weatherStatus.location}</Typography>
 				<Sun className={classes.svg} />
 				<Paper className={classes.weatherInformation}>
-					<Typography variant='body1'>星期日</Typography>
-					<Typography variant='body1'>Sunny</Typography>
-					<Typography align='center' variant='h3'>13</Typography>
-					<Typography align='center' variant='body2'>12~16</Typography>
-					<Typography align='right' variant='body2'>wind:strong</Typography>
-					<Typography align='right' variant='body2'>rain:many</Typography>
+					<Typography variant='body1'>星期{dayList[date]}</Typography>
+					<Typography variant='body1'>{`${weatherStatus.description}、${weatherStatus.comfortability}`}</Typography>
+					<Typography align='center' variant='h3'>{Math.round(weatherStatus.temp)}℃</Typography>
+					<Typography align='center' variant='body2'>{weatherStatus.minTemp}℃~{weatherStatus.maxTemp}℃</Typography>
+					<Typography align='right' variant='body2'>Wind:{weatherStatus.wind}m/h</Typography>
+					<Typography align='right' variant='body2'>Humidity:{weatherStatus.humid * 100}%</Typography>
+					<Typography align='right' variant='body2'>rain:{weatherStatus.rainPossibility}</Typography>
 				</Paper>
 			</Box>
 		</Paper>
