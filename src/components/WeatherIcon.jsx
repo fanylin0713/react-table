@@ -3,8 +3,8 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import { ReactComponent as Sun } from '../images/sun.svg';
 import { ReactComponent as CouldyDay } from '../images/cloudy-day.svg';
-// import { ReactComponent as Sun } from '../images/sun.svg';
-// import { ReactComponent as Sun } from '../images/sun.svg';
+import { ReactComponent as Clouds } from '../images/clouds.svg';
+import { ReactComponent as Rain } from '../images/rain.svg';
 
 const styles = () => ({
 	weatherSvg: {
@@ -25,6 +25,12 @@ const WeatherIcon = ({ weatherCode }) => {
 		}
 		if (weatherCode > 1 && weatherCode < 4){
 			return (<CouldyDay className={classes.weatherSvg} />)
+		}
+		if (weatherCode > 3 && weatherCode < 8){
+			return (<Clouds className={classes.weatherSvg} />)
+		}
+		if (weatherCode > 7 && weatherCode < 11){
+			return (<Rain className={classes.weatherSvg} />)
 		}
 		return <div/>
 	}

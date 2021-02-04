@@ -1,8 +1,7 @@
 import React, { useState, useCallback } from 'react';
-import { useDispatch } from 'react-redux';
-import { connect } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
-import axios from 'axios';
+import apis from "../redux/apis";
 import Box from '@material-ui/core/Box';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
@@ -10,7 +9,7 @@ import Button from '@material-ui/core/Button';
 
 import WeatherIcon from './WeatherIcon';
 import LocationDialog from './LocationDialog';
-import { setDialogOpen } from '../redux/action';
+import { setDialogOpen, setWeather } from '../redux/action';
 
 const styles = () => ({
 	paper: {
@@ -45,20 +44,15 @@ const styles = () => ({
 
 const useStyles = makeStyles(styles);
 
-const mapStateToProps = (state) => ({
-	location: state.weatherLocation.location
-})
-
-const Weather = ({ location }) => {
+const Weather = () => {
 	const dispatch = useDispatch();
+	const location = useSelector(state => state.weatherLocation.location)
+	const weather = useSelector(state => state.weatherLocation.weather)
 	const classes = useStyles();
 	const date = new Date().getDay();
 	const dayList = ['日', '一', '二', '三', '四', '五', '六'];
 	const AuthorizationKey = 'CWB-330FC854-CB5C-4364-AE2C-600F34DCF8AE'
-	const weatherUrl = `/v1/rest/datastore/O-A0003-001?Authorization=${AuthorizationKey}&locationName=${location.place}`
-	const weather36hUrl = `/v1/rest/datastore/F-C0032-001?Authorization=${AuthorizationKey}&locationName=${location.city}`
-	const [weatherStatus, setWeatherStatus] = useState({})
-
+console.log(weather)
 	const fetchData = useCallback(() => {
 		const fetchingData = async () => {
 			const [realTimeData, weather36hData] = await Promise.all([
@@ -66,10 +60,10 @@ const Weather = ({ location }) => {
 				fetchGetWeather36h(),
 			]);
 
-			setWeatherStatus({
+			dispatch(setWeather({
 				...realTimeData,
 				...weather36hData
-			})
+			}))
 		};
 
 		fetchingData();
@@ -80,7 +74,7 @@ const Weather = ({ location }) => {
 	}, [fetchData]);
 
 	const fetachGetRealtimeWeather = () => {
-		return axios.get(weatherUrl)
+		return apis.fetachGetRealtimeWeather({ AuthorizationKey: AuthorizationKey, locationName: location.place })
 			.then(res => {
 				const data = res.data.records.location[0];
 				const weatherElements = data.weatherElement.reduce(
@@ -105,7 +99,7 @@ const Weather = ({ location }) => {
 	}
 
 	const fetchGetWeather36h = () => {
-		return axios.get(weather36hUrl)
+		return apis.fetchGetWeather36h({ AuthorizationKey: AuthorizationKey, locationName: location.city })
 			.then((res) => {
 				const locationData = res.data.records.location[0];
 				const weatherElements = locationData.weatherElement.map(el => el.time[0].parameter);
@@ -128,19 +122,19 @@ const Weather = ({ location }) => {
 					<Button fullWidth onClick={() => dispatch(setDialogOpen(true))}>
 						<Typography align='center' variant='h6' >{location.city}</Typography>
 					</Button>
-					<WeatherIcon weatherCode={weatherStatus.weatherCode}/>
+					<WeatherIcon weatherCode={weather.weatherCode} />
 					<Paper className={classes.weatherInformation}>
 						<Box pb={3}>
 							<Typography variant='body1'>星期{dayList[date]}</Typography>
-							<Typography variant='body1'>{`${weatherStatus.description}、${weatherStatus.comfortability}`}</Typography>
+							<Typography variant='body1'>{`${weather.description}、${weather.comfortability}`}</Typography>
 						</Box>
 						<Box pb={3}>
-							<Typography align='center' variant='h3'>{Math.round(weatherStatus.temp)}℃</Typography>
-							<Typography align='center' variant='body2'>{weatherStatus.minTemp}℃~{weatherStatus.maxTemp}℃</Typography>
+							<Typography align='center' variant='h3'>{Math.round(weather.temp)}℃</Typography>
+							<Typography align='center' variant='body2'>{weather.minTemp}℃~{weather.maxTemp}℃</Typography>
 						</Box>
-						<Typography align='right' variant='body2'>風速： {weatherStatus.wind} m/h</Typography>
-						<Typography align='right' variant='body2'>濕度：{Math.round(weatherStatus.humid * 100)} %</Typography>
-						<Typography align='right' variant='body2'>降雨機率：{weatherStatus.rainPossibility} %</Typography>
+						<Typography align='right' variant='body2'>風速： {weather.wind} m/h</Typography>
+						<Typography align='right' variant='body2'>濕度：{Math.round(weather.humid * 100)} %</Typography>
+						<Typography align='right' variant='body2'>降雨機率：{weather.rainPossibility} %</Typography>
 					</Paper>
 				</Box>
 			</Paper>
@@ -148,7 +142,4 @@ const Weather = ({ location }) => {
 	)
 };
 
-
-export default connect(
-	mapStateToProps
-)(Weather);
+export default Weather

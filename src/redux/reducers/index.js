@@ -1,7 +1,8 @@
 import { combineReducers } from 'redux';
-import { SET_DIALOG_OPEN, SET_LOCATION } from '../action';
+import { SET_DIALOG_OPEN, SET_LOCATION, SET_WEATHER } from '../action';
 
 const initialState = {
+	weather:{},
 	location: {
 		city: '臺北市',
 		place: '臺北',
@@ -20,6 +21,11 @@ function weatherLocation(state = initialState, action) {
 			return {
 				...state,
 				location: action.payload.data
+			}
+		case SET_WEATHER:
+			return {
+				...state,
+				weather: action.payload
 			}
 		default:
 			return state;
