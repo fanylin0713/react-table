@@ -37,8 +37,7 @@ const weatherTypes = {
 
 const WeatherIcon = () => {
 	const classes = useStyles();
-	// const weatherCode = useSelector(state => state.weatherLocation.weather.weatherCode)
-	const weatherCode = 1
+	const weatherCode = useSelector(state => state.weatherLocation.weather.weatherCode)
 	const [weatherNow, setWeatherNow] = useState('');
 
 	const weatherCode2Type = (value) => {
