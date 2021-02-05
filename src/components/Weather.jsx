@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 import apis from "../redux/apis";
@@ -52,7 +52,7 @@ const Weather = () => {
 	const date = new Date().getDay();
 	const dayList = ['日', '一', '二', '三', '四', '五', '六'];
 	const AuthorizationKey = 'CWB-330FC854-CB5C-4364-AE2C-600F34DCF8AE'
-console.log(weather)
+
 	const fetchData = useCallback(() => {
 		const fetchingData = async () => {
 			const [realTimeData, weather36hData] = await Promise.all([
