@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
@@ -16,6 +16,7 @@ const LocationDialog = () => {
 	const location = useSelector(state => state.weatherLocation.location);
 	const open = useSelector(state => state.weatherLocation.dialogOpen);
 	const AuthorizationKey = 'CWB-330FC854-CB5C-4364-AE2C-600F34DCF8AE';
+	const [locationNow, setLocationNow] = useState(location)
 
 	const locationData = [
 		{
@@ -115,6 +116,7 @@ const LocationDialog = () => {
 				...realTimeData,
 				...weather36hData
 			}));
+			dispatch(setLocation(locationNow))
 			dispatch(setDialogOpen(false))
 		};
 
@@ -164,7 +166,7 @@ const LocationDialog = () => {
 
 	const handleChange = (e) => {
 		const location = locationData.filter(location => location.city === e.target.value)
-		dispatch(setLocation(location[0]))
+		setLocationNow(location[0])
 	};
 
 	const handleClose = () => {
@@ -178,7 +180,7 @@ const LocationDialog = () => {
 				<Select
 					fullWidth
 					variant="outlined"
-					value={location.city}
+					value={locationNow.city}
 					onChange={handleChange}
 					label="地點"
 				>
