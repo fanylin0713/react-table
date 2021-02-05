@@ -22,6 +22,8 @@ const styles = () => ({
 
 const useStyles = makeStyles(styles);
 
+const time = new Date().getHours();
+
 const weatherTypes = {
 	isClear: [1],
 	isClearCloud: [2, 3],
@@ -33,18 +35,10 @@ const weatherTypes = {
 	isSnowing: [23, 37, 42],
 };
 
-// isClear: <Sun />,
-// isClearCloud: <SunnyCloud />,
-// isCloudy: <Cloudy />,
-// isRainyCloud: <RainnyCloud />,
-// isThunderstorm: <ThunderStorm />,
-// isCloudyFog: <CloudyFog />,
-// isSunnyFog: <SunnyFog />,
-// isSnowing: <Snowy />,
-
 const WeatherIcon = () => {
 	const classes = useStyles();
-	const weatherCode = useSelector(state => state.weatherLocation.weather.weatherCode)
+	// const weatherCode = useSelector(state => state.weatherLocation.weather.weatherCode)
+	const weatherCode = 1
 	const [weatherNow, setWeatherNow] = useState('');
 
 	const weatherCode2Type = (value) => {
@@ -62,7 +56,7 @@ const WeatherIcon = () => {
 
 	const renderWeather = () => {
 		if (weatherNow === 'isClear') {
-			return <Sun className={classes.weatherSvg}/>
+			return ((time > 17 || time < 5) ? <Moon className={classes.weatherSvg}/> : <Sun className={classes.weatherSvg}/>)
 		}
 		if (weatherNow === 'isClearCloud') {
 			return <SunnyCloud className={classes.weatherSvg}/>
