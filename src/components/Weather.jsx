@@ -10,7 +10,7 @@ import Button from '@material-ui/core/Button';
 import WeatherIcon from './WeatherIcon';
 import LocationDialog from './LocationDialog';
 import { setDialogOpen, setWeather } from '../redux/action';
-
+const time = new Date().getHours();
 const styles = () => ({
 	paper: {
 		backgroundColor: '#ededed',
@@ -25,7 +25,8 @@ const styles = () => ({
 		boxShadow: '0 1px 3px 0 #999999',
 		boxSizing: 'border-box',
 		padding: '20px 15px',
-		backgroundColor: '#C4E1FF'
+		borderRadius: '5px',
+		background: (time > 17 || time < 5) ? 'linear-gradient(#044899, #050A30)' : 'linear-gradient(#82DBF9, #2072C8)'
 	},
 	weatherSvg: {
 		width: '150px',
@@ -34,7 +35,9 @@ const styles = () => ({
 	},
 	weatherInformation: {
 		padding: '10px 15px 10px 15px',
-		margin: '10px 0 0 0'
+		margin: '10px 0 0 0',
+		borderRadius: '10px',
+		color: (time > 17 || time < 5) ? '#050A30' : '#2072C8'
 	},
 	svg: {
 		width: '25px',
@@ -120,7 +123,9 @@ const Weather = () => {
 			<Paper className={classes.paper}>
 				<Box className={classes.container} >
 					<Button fullWidth onClick={() => dispatch(setDialogOpen(true))}>
-						<Typography align='center' variant='h6' >{location.city}</Typography>
+						<Typography align='center' variant='h6' style={{color: (time > 17 || time < 5) ? '#ffffff' : '#050A30'}}>
+							{location.city}
+						</Typography>
 					</Button>
 					<WeatherIcon weatherCode={weather.weatherCode} />
 					<Paper className={classes.weatherInformation}>
@@ -129,7 +134,7 @@ const Weather = () => {
 							<Typography variant='body1'>{`${weather.description}、${weather.comfortability}`}</Typography>
 						</Box>
 						<Box pb={3}>
-							<Typography align='center' variant='h3'>{Math.round(weather.temp)}℃</Typography>
+							<Typography align='center' variant='h2'>{Math.round(weather.temp)}℃</Typography>
 							<Typography align='center' variant='body2'>{weather.minTemp}℃~{weather.maxTemp}℃</Typography>
 						</Box>
 						<Typography align='right' variant='body2'>風速： {weather.wind} m/h</Typography>
