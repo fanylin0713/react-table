@@ -6,10 +6,13 @@ import Box from '@material-ui/core/Box';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 import WeatherIcon from './WeatherIcon';
 import LocationDialog from './LocationDialog';
+import FixedCenter from './FixedCenter';
 import { setDialogOpen, setWeather } from '../redux/action';
+
 const time = new Date().getHours();
 const styles = () => ({
 	paper: {
@@ -117,13 +120,20 @@ const Weather = () => {
 			});
 	}
 
+	if (Object.keys(weather).length === 0) {
+		return (
+			<FixedCenter>
+				<CircularProgress />
+			</FixedCenter>
+		)
+	}
 	return (
 		<>
 			<LocationDialog />
 			<Paper className={classes.paper}>
 				<Box className={classes.container} >
 					<Button fullWidth onClick={() => dispatch(setDialogOpen(true))}>
-						<Typography align='center' variant='h6' style={{color: (time > 17 || time < 5) ? '#ffffff' : '#050A30'}}>
+						<Typography align='center' variant='h6' style={{ color: (time > 17 || time < 5) ? '#ffffff' : '#050A30' }}>
 							{location.city}
 						</Typography>
 					</Button>
